@@ -4,6 +4,10 @@ const initializeSession = require("./config/session");
 
 const app = express();
 
+// Middleware to conf cors permission
+const corsMiddleware = require("./config/cors");
+app.use(corsMiddleware);
+
 // Middleware to parte JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
