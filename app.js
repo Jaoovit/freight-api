@@ -19,10 +19,12 @@ initializeSession(app);
 const userRoute = require("./routes/userRoute");
 const carRoute = require("./routes/carRoute");
 const deliveryRoute = require("./routes/deliveryRoute");
+const sessionRoute = require("./routes/sessionRoute");
 
 app.use(userRoute);
 app.use(carRoute);
 app.use(deliveryRoute);
+app.use(sessionRoute);
 
 const PORT = process.env.PORT || 5500;
 
