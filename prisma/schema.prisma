@@ -29,6 +29,7 @@ model User {
   neighborhood String
   postalCode   String
   role         String
+  workdays     String[]
   car          Cars[]
   delivery     Delivery[]
 }

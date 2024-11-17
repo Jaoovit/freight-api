@@ -39,6 +39,7 @@ const login = (req, res, next) => {
           city: user.city,
           neighborhood: user.neighborhood,
           profileImage: user.profileImage,
+          role: user.role,
         },
       });
     });
