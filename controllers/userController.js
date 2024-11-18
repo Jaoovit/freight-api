@@ -17,7 +17,6 @@ const createTransporterUser = async (req, res) => {
       city,
       neighborhood,
       postalCode,
-      workdays,
     } = req.body;
 
     if (
@@ -36,7 +35,46 @@ const createTransporterUser = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const existingUsername = await prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (existingUsername) {
+      return res.status(400).json({
+        message: "Username already exists",
+      });
+    }
+
+    const existingEmail = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (existingEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone: phone },
+    });
+    if (existingPhone) {
+      return res.status(400).json({
+        message: "Phone number already exists",
+      });
+    }
+
+    let { workdays } = req.body;
+
+    if (typeof workdays === "string") {
+      try {
+        workdays = JSON.parse(workdays);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid workdays format" });
+      }
+    }
+
     if (!Array.isArray(workdays) || workdays.length === 0) {
+      console.log("Received workdays:", workdays);
+      console.log("Type of workdays:", typeof workdays);
       return res
         .status(400)
         .json({ message: "Workdays must be a non-empty array of valid days" });
