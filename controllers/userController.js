@@ -22,6 +22,28 @@ const getTransportesUsers = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
+  if (isNaN(userId)) {
+    return res.status(400).json({ message: "Invalid user id" });
+  }
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: `User ${userId} gotted sucessfully`, user: user });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: `Error getting user ${userId}` });
+  }
+};
+
 const createTransporterUser = async (req, res) => {
   try {
     const {
@@ -177,4 +199,4 @@ const createTransporterUser = async (req, res) => {
   }
 };
 
-module.exports = { getTransportesUsers, createTransporterUser };
+module.exports = { getTransportesUsers, getUserById, createTransporterUser };

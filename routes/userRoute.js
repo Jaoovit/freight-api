@@ -7,6 +7,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 // Get
 router.get("/user/transporter", userController.getTransportesUsers);
+router.get("/user/:id", userController.getUserById);
 
 // Post
 router.post(
