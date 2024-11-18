@@ -16,4 +16,7 @@ router.post(
   userController.createTransporterUser
 );
 
+//Put
+router.put("/user/:id", userController.updateLocation);
+
 module.exports = router;

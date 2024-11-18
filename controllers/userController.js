@@ -25,14 +25,25 @@ const getTransportesUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
-  if (isNaN(userId)) {
-    return res.status(400).json({ message: "Invalid user id" });
-  }
-
   try {
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
     const user = await prisma.user.findUnique({
       where: {
         id: userId,
+      },
+      include: {
+        car: true,
+        delivery: true,
       },
     });
     return res
@@ -199,4 +210,53 @@ const createTransporterUser = async (req, res) => {
   }
 };
 
-module.exports = { getTransportesUsers, getUserById, createTransporterUser };
+const updateLocation = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
+  try {
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { state, city, neighborhood, postalCode } = req.body;
+
+    if (!state || !city || !neighborhood || !postalCode) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        state: state,
+        city: city,
+        neighborhood: neighborhood,
+        postalCode: postalCode,
+      },
+    });
+    return res.status(200).json({
+      message: `User ${userId} location updated sucessfully`,
+      user: user,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error updating user ${userId} location` });
+  }
+};
+
+module.exports = {
+  getTransportesUsers,
+  getUserById,
+  createTransporterUser,
+  updateLocation,
+};
