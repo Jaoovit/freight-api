@@ -3,6 +3,25 @@ const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 const cloudinary = require("../config/cloudinary");
 
+const getTransportesUsers = async (req, res) => {
+  try {
+    const role = "transporter";
+
+    const transporters = await prisma.user.findMany({
+      where: {
+        role: role,
+      },
+    });
+    return res.status(200).json({
+      message: "Get transportes sucessfully",
+      transporters: transporters,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: "Error getting transporter user" });
+  }
+};
+
 const createTransporterUser = async (req, res) => {
   try {
     const {
@@ -147,13 +166,15 @@ const createTransporterUser = async (req, res) => {
       },
     });
 
-    res
+    return res
       .status(200)
       .json({ message: "User created successfully", user: newTransporterUser });
   } catch (error) {
     console.error("Error details:", error);
-    res.status(500).send("Error registering transporter user");
+    return res
+      .status(500)
+      .json({ message: "Error registering transporter user" });
   }
 };
 
-module.exports = { createTransporterUser };
+module.exports = { getTransportesUsers, createTransporterUser };

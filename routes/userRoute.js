@@ -5,6 +5,9 @@ const router = express.Router();
 
 const upload = multer({ storage: multer.memoryStorage() });
 
+// Get
+router.get("/user/transporter", userController.getTransportesUsers);
+
 // Post
 router.post(
   "/user/transporter/register",
