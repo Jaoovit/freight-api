@@ -254,9 +254,81 @@ const updateLocation = async (req, res) => {
   }
 };
 
+const updateWorkDays = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  try {
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let { workdays } = req.body;
+
+    if (typeof workdays === "string") {
+      try {
+        workdays = JSON.parse(workdays);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid workdays format" });
+      }
+    }
+
+    if (!Array.isArray(workdays) || workdays.length === 0) {
+      console.log("Received workdays:", workdays);
+      console.log("Type of workdays:", typeof workdays);
+      return res
+        .status(400)
+        .json({ message: "Workdays must be a non-empty array of valid days" });
+    }
+
+    const validDays = [
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+    ];
+
+    const isValidWorkdays = workdays.every((day) => validDays.includes(day));
+    if (!isValidWorkdays) {
+      return res.status(400).json({
+        message:
+          "Workdays must only include valid days like 'Monday', 'Tuesday', etc.",
+      });
+    }
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        workdays: workdays,
+      },
+    });
+
+    return res.status(200).json({
+      message: `User ${userId} workdays updated sucessfully`,
+      user: user,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error updating user ${userId} workdays` });
+  }
+};
+
 module.exports = {
   getTransportesUsers,
   getUserById,
   createTransporterUser,
   updateLocation,
+  updateWorkDays,
 };
