@@ -25,12 +25,12 @@ model User {
   email        String @unique
   phone        String @unique
   profileImage String
-  state        String
-  city         String
-  neighborhood String
-  postalCode   String
+  state        String?
+  city         String?
+  neighborhood String?
+  postalCode   String?
   role         String
-  workdays     String[]
+  workdays     String[] @default([])
   car          Cars[]
   delivery     Delivery[]
 }

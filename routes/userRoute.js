@@ -16,6 +16,11 @@ router.post(
   upload.single("profileImage"),
   userController.createTransporterUser
 );
+router.post(
+  "/user/admin/register",
+  upload.single("profileImage"),
+  userController.createAdminUser
+);
 
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);

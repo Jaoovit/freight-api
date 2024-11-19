@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
@@ -210,6 +211,123 @@ const createTransporterUser = async (req, res) => {
   }
 };
 
+const createAdminUser = async (req, res) => {
+  try {
+    const ADMIN_SECRET = process.env.ADMIN_SECRET;
+
+    const { secret } = req.body;
+
+    if (!secret) {
+      return res.status(400).json({ message: "Secret is required" });
+    }
+
+    if (secret !== ADMIN_SECRET) {
+      return res
+        .status(401)
+        .json({ message: "Permission to create an admin account denied" });
+    }
+
+    const {
+      username,
+      password,
+      confPassword,
+      firstName,
+      lastName,
+      email,
+      phone,
+    } = req.body;
+
+    if (
+      !username ||
+      !password ||
+      !confPassword ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUsername = await prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (existingUsername) {
+      return res.status(400).json({
+        message: "Username already exists",
+      });
+    }
+
+    const existingEmail = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (existingEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone: phone },
+    });
+    if (existingPhone) {
+      return res.status(400).json({
+        message: "Phone number already exists",
+      });
+    }
+
+    if (password !== confPassword) {
+      return res
+        .status(400)
+        .json({ message: "Password must match password confirmation" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role = "admin";
+
+    let profileImageUrl = "https://example.com/default-image.jpg";
+
+    if (req.file) {
+      try {
+        const uploadResult = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream({ resource_type: "image" }, (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            })
+            .end(req.file.buffer);
+        });
+        profileImageUrl = uploadResult.secure_url;
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res
+          .status(400)
+          .json({ message: "Failed to upload image", error: cloudinaryError });
+      }
+    }
+
+    const newAdminUser = await prisma.user.create({
+      data: {
+        username,
+        firstName,
+        lastName,
+        password: hashedPassword,
+        email,
+        phone,
+        role,
+        profileImage: profileImageUrl,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "User created successfully", user: newAdminUser });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: "Error registering admin user" });
+  }
+};
+
 const updateLocation = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
@@ -385,7 +503,7 @@ const updateProfileImage = async (req, res) => {
       return res.status(400).json({ message: "New profile image is required" });
     }
 
-    let profileImage = null;
+    let profileImageUrl = null;
 
     try {
       const uploadResult = await new Promise((resolve, reject) => {
@@ -396,7 +514,7 @@ const updateProfileImage = async (req, res) => {
           })
           .end(req.file.buffer);
       });
-      profileImage = uploadResult.secure_url;
+      profileImageUrl = uploadResult.secure_url;
     } catch (cloudinaryError) {
       console.error("Cloudinary upload error:", cloudinaryError);
       return res
@@ -409,7 +527,7 @@ const updateProfileImage = async (req, res) => {
         id: userId,
       },
       data: {
-        profileImage: profileImage,
+        profileImage: profileImageUrl,
       },
     });
     return res.status(200).json({
@@ -427,6 +545,7 @@ module.exports = {
   getTransportesUsers,
   getUserById,
   createTransporterUser,
+  createAdminUser,
   updateLocation,
   updateWorkDays,
   updatePhone,
