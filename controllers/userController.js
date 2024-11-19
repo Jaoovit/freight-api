@@ -325,10 +325,52 @@ const updateWorkDays = async (req, res) => {
   }
 };
 
+const updatePhone = async (req, res) => {
+  const userId = parseInt(req.params.id);
+  try {
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { phone } = req.body;
+
+    if (!phone) {
+      return res.status(400).json({ message: "A phone number is required" });
+    }
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        phone: phone,
+      },
+    });
+
+    return res.status(200).json({
+      message: `User ${userId} phone updated sucessfully`,
+      user: user,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error updating user ${userId} phone` });
+  }
+};
+
 module.exports = {
   getTransportesUsers,
   getUserById,
   createTransporterUser,
   updateLocation,
   updateWorkDays,
+  updatePhone,
 };

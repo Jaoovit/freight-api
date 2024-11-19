@@ -20,5 +20,6 @@ router.post(
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);
 router.put("/user/:id/workdays", verifyToken, userController.updateWorkDays);
+router.put("/user/:id/phone", verifyToken, userController.updatePhone);
 
 module.exports = router;
