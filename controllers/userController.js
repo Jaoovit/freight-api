@@ -59,6 +59,8 @@ const getUserById = async (req, res) => {
 const searchUserTransporterByLocation = async (req, res) => {
   const { query } = req.query;
   try {
+    const role = "transporter";
+
     const transporters = await prisma.user.findMany({
       where: {
         OR: [
@@ -66,6 +68,7 @@ const searchUserTransporterByLocation = async (req, res) => {
           { city: { contains: query, mode: "insensitive" } },
           { neighborhood: { contains: query, mode: "insensitive" } },
         ],
+        role: role,
       },
     });
     return res.status(200).json({
