@@ -366,6 +366,63 @@ const updatePhone = async (req, res) => {
   }
 };
 
+const updateProfileImage = async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+  try {
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: "Invalid user id" });
+    }
+
+    const userExists = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: "New profile image is required" });
+    }
+
+    let profileImage = null;
+
+    try {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ resource_type: "image" }, (error, result) => {
+            if (error) return reject(error);
+            resolve(result);
+          })
+          .end(req.file.buffer);
+      });
+      profileImage = uploadResult.secure_url;
+    } catch (cloudinaryError) {
+      console.error("Cloudinary upload error:", cloudinaryError);
+      return res
+        .status(400)
+        .json({ message: "Failed to upload image", error: cloudinaryError });
+    }
+
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        profileImage: profileImage,
+      },
+    });
+    return res.status(200).json({
+      message: `User ${userId} profile image updated sucessfully`,
+      user: user,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: `Error updating user ${userId} profile image` });
+  }
+};
+
 module.exports = {
   getTransportesUsers,
   getUserById,
@@ -373,4 +430,5 @@ module.exports = {
   updateLocation,
   updateWorkDays,
   updatePhone,
+  updateProfileImage,
 };

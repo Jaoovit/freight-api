@@ -21,5 +21,11 @@ router.post(
 router.put("/user/:id/location", verifyToken, userController.updateLocation);
 router.put("/user/:id/workdays", verifyToken, userController.updateWorkDays);
 router.put("/user/:id/phone", verifyToken, userController.updatePhone);
+router.put(
+  "/user/:id/profileImage",
+  verifyToken,
+  upload.single("profileImage"),
+  userController.updateProfileImage
+);
 
 module.exports = router;
