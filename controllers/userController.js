@@ -56,6 +56,30 @@ const getUserById = async (req, res) => {
   }
 };
 
+const searchUserTransporterByLocation = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const transporters = await prisma.user.findMany({
+      where: {
+        OR: [
+          { state: { contains: query, mode: "insensitive" } },
+          { city: { contains: query, mode: "insensitive" } },
+          { neighborhood: { contains: query, mode: "insensitive" } },
+        ],
+      },
+    });
+    return res.status(200).json({
+      message: `Searching for ${query} sucessfully`,
+      transporters: transporters,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res
+      .status(500)
+      .json({ message: `Error searching user transporter by location` });
+  }
+};
+
 const createTransporterUser = async (req, res) => {
   try {
     const {
@@ -544,6 +568,7 @@ const updateProfileImage = async (req, res) => {
 module.exports = {
   getTransportesUsers,
   getUserById,
+  searchUserTransporterByLocation,
   createTransporterUser,
   createAdminUser,
   updateLocation,

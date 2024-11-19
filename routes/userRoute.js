@@ -9,6 +9,10 @@ const upload = multer({ storage: multer.memoryStorage() });
 // Get
 router.get("/user/transporter", userController.getTransportesUsers);
 router.get("/user/:id", userController.getUserById);
+router.get(
+  "/user/transporter/search",
+  userController.searchUserTransporterByLocation
+);
 
 // Post
 router.post(
