@@ -57,4 +57,45 @@ const registerDelivery = async (req, res) => {
   }
 };
 
-module.exports = { registerDelivery };
+const updateDeliveryToPaid = async (req, res) => {
+  const deliveryId = parseInt(req.params.id, 10);
+  try {
+    if (isNaN(deliveryId)) {
+      return res.status(400).json({ message: "Invalid delivery id" });
+    }
+
+    const deliveryExists = await prisma.delivery.findUnique({
+      where: {
+        id: deliveryId,
+      },
+    });
+
+    if (!deliveryExists) {
+      return res
+        .status(404)
+        .json({ message: `Delivery ${deliveryId} not found` });
+    }
+
+    const status = "paid";
+
+    const delivery = await prisma.delivery.update({
+      where: {
+        id: deliveryId,
+      },
+      data: {
+        status: status,
+      },
+    });
+    return res.status(200).json({
+      message: `Delivery ${deliveryId} status updated to paid sucessfully`,
+      delivery: delivery,
+    });
+  } catch (error) {
+    console.error("Error details", error);
+    return res
+      .status(500)
+      .json({ message: `Error updating delivery ${deliveryId} to paid` });
+  }
+};
+
+module.exports = { registerDelivery, updateDeliveryToPaid };
