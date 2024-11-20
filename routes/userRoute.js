@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const userController = require("../controllers/userController");
 const carController = require("../controllers/carController");
+const deliveryController = require("../controllers/deliveryController");
 const router = express.Router();
 const verifyToken = require("../config/token");
 
@@ -27,6 +28,7 @@ router.post(
   userController.createAdminUser
 );
 router.post("/user/:id/car", verifyToken, carController.registerCar);
+router.post("/user/:id/delivery", deliveryController.registerDelivery);
 
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);
