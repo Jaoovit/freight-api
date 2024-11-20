@@ -26,7 +26,7 @@ router.post(
   upload.single("profileImage"),
   userController.createAdminUser
 );
-router.post("/user/:id/car", carController.registerCar);
+router.post("/user/:id/car", verifyToken, carController.registerCar);
 
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);

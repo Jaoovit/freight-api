@@ -14,32 +14,34 @@ CREATE TABLE "Session" (
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "profileImage" TEXT NOT NULL,
-    "state" TEXT NOT NULL,
-    "city" TEXT NOT NULL,
-    "neighborhood" TEXT NOT NULL,
-    "postalCode" TEXT NOT NULL,
+    "state" TEXT,
+    "city" TEXT,
+    "neighborhood" TEXT,
+    "postalCode" TEXT,
     "role" TEXT NOT NULL,
+    "workdays" TEXT[] DEFAULT ARRAY[]::TEXT[],
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Cars" (
+CREATE TABLE "Car" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "registration" TEXT NOT NULL,
     "model" TEXT NOT NULL,
     "color" TEXT NOT NULL,
-    "heigth" DOUBLE PRECISION NOT NULL,
+    "height" DOUBLE PRECISION NOT NULL,
     "width" DOUBLE PRECISION NOT NULL,
     "depth" DOUBLE PRECISION NOT NULL,
 
-    CONSTRAINT "Cars_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Car_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -59,13 +61,22 @@ CREATE TABLE "Delivery" (
 CREATE UNIQUE INDEX "Session_sid_key" ON "Session"("sid");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "Car_registration_key" ON "Car"("registration");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Delivery_protocol_key" ON "Delivery"("protocol");
+
 -- AddForeignKey
-ALTER TABLE "Cars" ADD CONSTRAINT "Cars_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Car" ADD CONSTRAINT "Car_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Delivery" ADD CONSTRAINT "Delivery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

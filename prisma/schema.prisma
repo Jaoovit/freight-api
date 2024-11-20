@@ -31,15 +31,15 @@ model User {
   postalCode   String?
   role         String
   workdays     String[] @default([])
-  car          Cars[]
+  car          Car[]
   delivery     Delivery[]
 }
 
-model Cars {
+model Car {
   id           Int    @id @default(autoincrement())
   userId       Int
-  user         User      @relation(fields: [userId], references: [id])
-  registration String
+  user         User   @relation(fields: [userId], references: [id])
+  registration String @unique
   model        String
   color        String
   height       Float
@@ -51,7 +51,7 @@ model Delivery {
   id        Int      @id @default(autoincrement())
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
-  protocol  String
+  protocol  String   @unique
   price     Float
   fee       Float
   status    String

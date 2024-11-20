@@ -9,9 +9,6 @@ const registerCar = async (req, res) => {
       return res.status(400).json({ message: "Invalid user id" });
     }
 
-    if (!userId) {
-    }
-
     const userExists = await prisma.user.findUnique({
       where: { id: userId },
       include: { car: true },
@@ -31,6 +28,14 @@ const registerCar = async (req, res) => {
 
     const { registration, model, color } = req.body;
 
+    const existingRegistration = await prisma.car.findUnique({
+      where: { registration: registration },
+    });
+
+    if (existingRegistration) {
+      return res.status(400).json({ message: "Registration already exists" });
+    }
+
     if (!registration || !model || !color) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -43,7 +48,11 @@ const registerCar = async (req, res) => {
       return res.status(400).json({ message: "Invalid dimensions" });
     }
 
-    const car = await prisma.cars.create({
+    if (!height || !width || !depth) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const car = await prisma.car.create({
       data: {
         userId: userId,
         registration,
@@ -63,4 +72,51 @@ const registerCar = async (req, res) => {
   }
 };
 
-module.exports = { registerCar };
+const updateCarSize = async (req, res) => {
+  const carId = parseInt(req.params.id, 10);
+
+  try {
+    if (isNaN(carId)) {
+      return res.status(400).json({ message: "Invalid car id" });
+    }
+
+    const carExist = await prisma.car.findUnique({
+      where: { id: carId },
+    });
+
+    if (!carExist) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    const height = parseFloat(req.body.height);
+    const width = parseFloat(req.body.width);
+    const depth = parseFloat(req.body.depth);
+
+    if (isNaN(height) || isNaN(width) || isNaN(depth)) {
+      return res.status(400).json({ message: "Invalid dimensions" });
+    }
+
+    if (!height || !width || !depth) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const car = await prisma.car.update({
+      where: {
+        id: carId,
+      },
+      data: {
+        height: height,
+        width: width,
+        depth: depth,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: `Car ${carId} updated sucessfully`, car: car });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: `Error updating car ${carId}` });
+  }
+};
+
+module.exports = { registerCar, updateCarSize };
