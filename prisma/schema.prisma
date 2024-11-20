@@ -42,7 +42,7 @@ model Cars {
   registration String
   model        String
   color        String
-  heigth       Float
+  height       Float
   width        Float
   depth        Float
 }

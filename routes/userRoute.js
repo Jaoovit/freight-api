@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const userController = require("../controllers/userController");
+const carController = require("../controllers/carController");
 const router = express.Router();
 const verifyToken = require("../config/token");
 
@@ -25,6 +26,7 @@ router.post(
   upload.single("profileImage"),
   userController.createAdminUser
 );
+router.post("/user/:id/car", carController.registerCar);
 
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);
