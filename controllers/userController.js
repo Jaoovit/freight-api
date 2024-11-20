@@ -14,7 +14,7 @@ const getTransportesUsers = async (req, res) => {
       },
     });
     return res.status(200).json({
-      message: "Get transportes sucessfully",
+      message: "Got transportes sucessfully",
       transporters: transporters,
     });
   } catch (error) {
@@ -49,7 +49,7 @@ const getUserById = async (req, res) => {
     });
     return res
       .status(200)
-      .json({ message: `User ${userId} gotted sucessfully`, user: user });
+      .json({ message: `User ${userId} got sucessfully`, user: user });
   } catch (error) {
     console.error("Error details:", error);
     return res.status(500).json({ message: `Error getting user ${userId}` });

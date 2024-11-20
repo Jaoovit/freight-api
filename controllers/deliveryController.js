@@ -1,6 +1,25 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
+const getUnpaidDelivery = async (req, res) => {
+  try {
+    const status = "Unpaid";
+
+    const unpaidDelivery = await prisma.delivery.findMany({
+      where: {
+        status: status,
+      },
+    });
+    return res.status(200).json({
+      message: "Unpaid delivery got sucessfully",
+      unpaidDelivery: unpaidDelivery,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: "Error getting unpaid delivery" });
+  }
+};
+
 const registerDelivery = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
   try {
@@ -98,4 +117,4 @@ const updateDeliveryToPaid = async (req, res) => {
   }
 };
 
-module.exports = { registerDelivery, updateDeliveryToPaid };
+module.exports = { getUnpaidDelivery, registerDelivery, updateDeliveryToPaid };
