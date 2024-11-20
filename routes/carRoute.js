@@ -6,4 +6,7 @@ const router = express.Router();
 // Put
 router.put("/car/:id", verifyToken, carController.updateCarSize);
 
+// Delete
+router.delete("/car/:id", verifyToken, carController.deleteCar);
+
 module.exports = router;

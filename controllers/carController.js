@@ -119,4 +119,33 @@ const updateCarSize = async (req, res) => {
   }
 };
 
-module.exports = { registerCar, updateCarSize };
+const deleteCar = async (req, res) => {
+  const carId = parseInt(req.params.id, 10);
+  try {
+    if (isNaN(carId)) {
+      return res.status(400).json({ message: "Invalid car id" });
+    }
+
+    const carExist = await prisma.car.findUnique({
+      where: { id: carId },
+    });
+
+    if (!carExist) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
+    await prisma.car.delete({
+      where: {
+        id: carId,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: `Car ${carId} deleted sucessfully` });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: `Error deleting car ${carId}` });
+  }
+};
+
+module.exports = { registerCar, updateCarSize, deleteCar };
