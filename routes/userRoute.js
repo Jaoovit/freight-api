@@ -29,6 +29,7 @@ router.post(
 );
 router.post("/user/:id/car", verifyToken, carController.registerCar);
 router.post("/user/:id/delivery", deliveryController.registerDelivery);
+router.post("/user/forgot_password", userController.sendTokenToUpdatePassword);
 
 //Put
 router.put("/user/:id/location", verifyToken, userController.updateLocation);
@@ -40,5 +41,6 @@ router.put(
   upload.single("profileImage"),
   userController.updateProfileImage
 );
+router.put("/user/password", userController.updatePassword);
 
 module.exports = router;

@@ -17,22 +17,24 @@ model Session {
 }
 
 model User {
-  id           Int    @id @default(autoincrement())
-  username     String @unique
-  password     String
-  firstName    String
-  lastName     String
-  email        String @unique
-  phone        String @unique
-  profileImage String
-  state        String?
-  city         String?
-  neighborhood String?
-  postalCode   String?
-  role         String
-  workdays     String[] @default([])
-  car          Car[]
-  delivery     Delivery[]
+  id                   Int    @id @default(autoincrement())
+  username             String @unique
+  password             String
+  firstName            String
+  lastName             String
+  email                String @unique
+  phone                String @unique
+  profileImage         String
+  state                String?
+  city                 String?
+  neighborhood         String?
+  postalCode           String?
+  role                 String
+  workdays             String[] @default([])
+  car                  Car[]
+  delivery             Delivery[]
+  passwordResetToken   String?
+  passwordResetExpires DateTime?
 }
 
 model Car {

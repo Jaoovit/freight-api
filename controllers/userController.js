@@ -3,6 +3,8 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
 const cloudinary = require("../config/cloudinary");
+const crypto = require("crypto");
+const nodemailer = require("../config/nodemailer");
 
 const getTransportesUsers = async (req, res) => {
   try {
@@ -355,6 +357,61 @@ const createAdminUser = async (req, res) => {
   }
 };
 
+const sendTokenToUpdatePassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const EMAIL_TITLE_UPDATE_PASSWORD = process.env.EMAIL_TITLE_UPDATE_PASSWORD;
+    const EMAIL_TEXT_UPDATE_PASSWORD = process.env.EMAIL_TEXT_UPDATE_PASSWORD;
+    const NODEMAILER_EMAIL_PROVIDER = process.env.NODEMAILER_EMAIL_PROVIDER;
+
+    const userExists = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (!userExists) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const token = crypto.randomBytes(20).toString("hex");
+
+    const now = new Date();
+
+    now.setHours(now.getHours() + 1);
+
+    const user = await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        passwordResetToken: token,
+        passwordResetExpires: now,
+      },
+    });
+
+    nodemailer.sendMail({
+      to: email,
+      from: NODEMAILER_EMAIL_PROVIDER,
+      subject: EMAIL_TITLE_UPDATE_PASSWORD,
+      text: `${EMAIL_TEXT_UPDATE_PASSWORD} ${token}`,
+    }),
+      (error) => {
+        if (error) {
+          return res.status(400).json({
+            message: `Error sending updating password token to ${email}`,
+          });
+        }
+      };
+    return res
+      .status(200)
+      .json({ message: `Token to ${email} sent successfully`, user: user });
+  } catch (error) {
+    return res.status(500).json({ message: `Error updating password` });
+  }
+};
+
 const updateLocation = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
@@ -568,14 +625,66 @@ const updateProfileImage = async (req, res) => {
   }
 };
 
+const updatePassword = async (req, res) => {
+  const { email, token, password, confPassword } = req.body;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (token !== user.passwordResetToken) {
+      return res.status(400).json({ message: "Invalid Token" });
+    }
+
+    const now = new Date();
+
+    if (now > user.passwordResetExpires) {
+      return res
+        .status(400)
+        .json({ message: "Token expired, generate a new one" });
+    }
+
+    if (password !== confPassword) {
+      return res
+        .status(400)
+        .json({ message: "Password must match password confirmation" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await prisma.user.update({
+      where: {
+        email: email,
+      },
+      data: {
+        password: hashedPassword,
+        passwordResetToken: null,
+        passwordResetExpires: null,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: "Password updated successfully.", user: user });
+  } catch (error) {
+    return res.status(500).json({ message: "Error updating password" });
+  }
+};
+
 module.exports = {
   getTransportesUsers,
   getUserById,
   searchUserTransporterByLocation,
   createTransporterUser,
   createAdminUser,
+  sendTokenToUpdatePassword,
   updateLocation,
   updateWorkDays,
   updatePhone,
   updateProfileImage,
+  updatePassword,
 };
