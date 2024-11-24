@@ -244,7 +244,10 @@ const createTransporterUser = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "User created successfully", user: newTransporterUser });
+      .json({
+        message: "Transporter user created successfully",
+        user: newTransporterUser,
+      });
   } catch (error) {
     console.error("Error details:", error);
     return res
@@ -338,7 +341,7 @@ const createOperatorUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const role = "admin";
+    const role = "operator";
 
     let profileImageUrl = "https://example.com/default-image.jpg";
 
@@ -361,7 +364,7 @@ const createOperatorUser = async (req, res) => {
       }
     }
 
-    const newAdminUser = await prisma.user.create({
+    const newOperatorUser = await prisma.user.create({
       data: {
         username,
         firstName,
@@ -374,12 +377,277 @@ const createOperatorUser = async (req, res) => {
         profileImage: profileImageUrl,
       },
     });
-    return res
-      .status(200)
-      .json({ message: "User created successfully", user: newAdminUser });
+    return res.status(200).json({
+      message: "Operator user created successfully",
+      user: newOperatorUser,
+    });
   } catch (error) {
     console.error("Error details:", error);
-    return res.status(500).json({ message: "Error registering admin user" });
+    return res.status(500).json({ message: "Error registering operator user" });
+  }
+};
+
+const createSupervisorUser = async (req, res) => {
+  try {
+    const SUPERVISOR_SECRET = process.env.SUPERVISOR_SECRET;
+
+    const { secret } = req.body;
+
+    if (!secret) {
+      return res.status(400).json({ message: "Secret is required" });
+    }
+
+    if (secret !== SUPERVISOR_SECRET) {
+      return res
+        .status(401)
+        .json({ message: "Permission to create a supervisor account denied" });
+    }
+
+    const {
+      username,
+      password,
+      confPassword,
+      firstName,
+      lastName,
+      taxDocument,
+      email,
+      phone,
+    } = req.body;
+
+    if (
+      !username ||
+      !password ||
+      !confPassword ||
+      !firstName ||
+      !lastName ||
+      !taxDocument ||
+      !email ||
+      !phone
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUsername = await prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (existingUsername) {
+      return res.status(400).json({
+        message: "Username already exists",
+      });
+    }
+
+    const existingTaxDocument = await prisma.user.findUnique({
+      where: { taxDocument: taxDocument },
+    });
+
+    if (existingTaxDocument) {
+      return res.status(400).json({
+        messafe: "Tax document already exists",
+      });
+    }
+
+    const existingEmail = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (existingEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone: phone },
+    });
+    if (existingPhone) {
+      return res.status(400).json({
+        message: "Phone number already exists",
+      });
+    }
+
+    if (password !== confPassword) {
+      return res
+        .status(400)
+        .json({ message: "Password must match password confirmation" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role = "supervisor";
+
+    let profileImageUrl = "https://example.com/default-image.jpg";
+
+    if (req.file) {
+      try {
+        const uploadResult = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream({ resource_type: "image" }, (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            })
+            .end(req.file.buffer);
+        });
+        profileImageUrl = uploadResult.secure_url;
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res
+          .status(400)
+          .json({ message: "Failed to upload image", error: cloudinaryError });
+      }
+    }
+
+    const newOperatorUser = await prisma.user.create({
+      data: {
+        username,
+        firstName,
+        lastName,
+        taxDocument,
+        password: hashedPassword,
+        email,
+        phone,
+        role,
+        profileImage: profileImageUrl,
+      },
+    });
+    return res.status(200).json({
+      message: "Supervisor user created successfully",
+      user: newOperatorUser,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res
+      .status(500)
+      .json({ message: "Error registering supervisor user" });
+  }
+};
+
+const createManagerUser = async (req, res) => {
+  try {
+    const MANAGER_SECRET = process.env.MANAGER_SECRET;
+
+    const { secret } = req.body;
+
+    if (!secret) {
+      return res.status(400).json({ message: "Secret is required" });
+    }
+
+    if (secret !== MANAGER_SECRET) {
+      return res
+        .status(401)
+        .json({ message: "Permission to create a manager account denied" });
+    }
+
+    const {
+      username,
+      password,
+      confPassword,
+      firstName,
+      lastName,
+      taxDocument,
+      email,
+      phone,
+    } = req.body;
+
+    if (
+      !username ||
+      !password ||
+      !confPassword ||
+      !firstName ||
+      !lastName ||
+      !taxDocument ||
+      !email ||
+      !phone
+    ) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    const existingUsername = await prisma.user.findUnique({
+      where: { username: username },
+    });
+    if (existingUsername) {
+      return res.status(400).json({
+        message: "Username already exists",
+      });
+    }
+
+    const existingTaxDocument = await prisma.user.findUnique({
+      where: { taxDocument: taxDocument },
+    });
+
+    if (existingTaxDocument) {
+      return res.status(400).json({
+        messafe: "Tax document already exists",
+      });
+    }
+
+    const existingEmail = await prisma.user.findUnique({
+      where: { email: email },
+    });
+    if (existingEmail) {
+      return res.status(400).json({
+        message: "Email already exists",
+      });
+    }
+
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone: phone },
+    });
+    if (existingPhone) {
+      return res.status(400).json({
+        message: "Phone number already exists",
+      });
+    }
+
+    if (password !== confPassword) {
+      return res
+        .status(400)
+        .json({ message: "Password must match password confirmation" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const role = "manager";
+
+    let profileImageUrl = "https://example.com/default-image.jpg";
+
+    if (req.file) {
+      try {
+        const uploadResult = await new Promise((resolve, reject) => {
+          cloudinary.uploader
+            .upload_stream({ resource_type: "image" }, (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            })
+            .end(req.file.buffer);
+        });
+        profileImageUrl = uploadResult.secure_url;
+      } catch (cloudinaryError) {
+        console.error("Cloudinary upload error:", cloudinaryError);
+        return res
+          .status(400)
+          .json({ message: "Failed to upload image", error: cloudinaryError });
+      }
+    }
+
+    const newOperatorUser = await prisma.user.create({
+      data: {
+        username,
+        firstName,
+        lastName,
+        taxDocument,
+        password: hashedPassword,
+        email,
+        phone,
+        role,
+        profileImage: profileImageUrl,
+      },
+    });
+    return res.status(200).json({
+      message: "Manager user created successfully",
+      user: newOperatorUser,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: "Error registering manager user" });
   }
 };
 
@@ -707,6 +975,8 @@ module.exports = {
   searchUserTransporterByLocation,
   createTransporterUser,
   createOperatorUser,
+  createSupervisorUser,
+  createManagerUser,
   sendTokenToUpdatePassword,
   updateLocation,
   updateWorkDays,

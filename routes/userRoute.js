@@ -27,6 +27,16 @@ router.post(
   upload.single("profileImage"),
   userController.createOperatorUser
 );
+router.post(
+  "/user/supervisor/register",
+  upload.single("profileImage"),
+  userController.createSupervisorUser
+);
+router.post(
+  "/user/manager/register",
+  upload.single("profileImage"),
+  userController.createManagerUser
+);
 router.post("/user/:id/car", verifyToken, carController.registerCar);
 router.post("/user/:id/delivery", deliveryController.registerDelivery);
 router.post("/user/forgot_password", userController.sendTokenToUpdatePassword);
