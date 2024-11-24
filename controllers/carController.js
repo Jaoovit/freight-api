@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const cloudinary = require("../config/cloudinary");
 
 const registerCar = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
@@ -58,6 +59,14 @@ const registerCar = async (req, res) => {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const images = req.files;
+
+    if (images.length > 5) {
+      return res
+        .status(400)
+        .json({ message: "You can upload a maximum of 5 images" });
+    }
+
     let imageUrls = [];
     const uploadPromises = images.map((image) => {
       return new Promise((resolve, reject) => {
@@ -71,6 +80,8 @@ const registerCar = async (req, res) => {
           .end(image.buffer);
       });
     });
+
+    imageUrls = await Promise.all(uploadPromises);
 
     const car = await prisma.car.create({
       data: {

@@ -39,7 +39,7 @@ router.post(
 );
 router.post(
   "/user/:id/car",
-  verifyToken,
+  /*verifyToken*/
   upload.array("images"),
   carController.registerCar
 );
