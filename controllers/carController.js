@@ -56,6 +56,10 @@ const registerCar = async (req, res) => {
       return res.status(404).json({ message: "User not found" });
     }
 
+    if (userExists.role !== "transporter") {
+      return res.status(400).json({ message: "The user isen't a transporter" });
+    }
+
     const userCarsLength = userExists.car.length;
 
     if (userCarsLength > 4) {
