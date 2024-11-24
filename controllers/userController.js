@@ -91,6 +91,7 @@ const createTransporterUser = async (req, res) => {
       username,
       firstName,
       lastName,
+      taxDocument,
       password,
       confPassword,
       email,
@@ -105,6 +106,7 @@ const createTransporterUser = async (req, res) => {
       !username ||
       !firstName ||
       !lastName ||
+      !taxDocument ||
       !password ||
       !confPassword ||
       !email ||
@@ -123,6 +125,16 @@ const createTransporterUser = async (req, res) => {
     if (existingUsername) {
       return res.status(400).json({
         message: "Username already exists",
+      });
+    }
+
+    const existingTaxDocument = await prisma.user.findUnique({
+      where: { taxDocument: taxDocument },
+    });
+
+    if (existingTaxDocument) {
+      return res.status(400).json({
+        messafe: "Tax document already exists",
       });
     }
 
@@ -216,6 +228,7 @@ const createTransporterUser = async (req, res) => {
         username,
         firstName,
         lastName,
+        taxDocument,
         password: hashedPassword,
         email,
         phone,
@@ -240,9 +253,9 @@ const createTransporterUser = async (req, res) => {
   }
 };
 
-const createAdminUser = async (req, res) => {
+const createOperatorUser = async (req, res) => {
   try {
-    const ADMIN_SECRET = process.env.ADMIN_SECRET;
+    const OPERATOR_SECRET = process.env.OPERATOR_SECRET;
 
     const { secret } = req.body;
 
@@ -250,10 +263,10 @@ const createAdminUser = async (req, res) => {
       return res.status(400).json({ message: "Secret is required" });
     }
 
-    if (secret !== ADMIN_SECRET) {
+    if (secret !== OPERATOR_SECRET) {
       return res
         .status(401)
-        .json({ message: "Permission to create an admin account denied" });
+        .json({ message: "Permission to create an operator account denied" });
     }
 
     const {
@@ -262,6 +275,7 @@ const createAdminUser = async (req, res) => {
       confPassword,
       firstName,
       lastName,
+      taxDocument,
       email,
       phone,
     } = req.body;
@@ -272,6 +286,7 @@ const createAdminUser = async (req, res) => {
       !confPassword ||
       !firstName ||
       !lastName ||
+      !taxDocument ||
       !email ||
       !phone
     ) {
@@ -284,6 +299,16 @@ const createAdminUser = async (req, res) => {
     if (existingUsername) {
       return res.status(400).json({
         message: "Username already exists",
+      });
+    }
+
+    const existingTaxDocument = await prisma.user.findUnique({
+      where: { taxDocument: taxDocument },
+    });
+
+    if (existingTaxDocument) {
+      return res.status(400).json({
+        messafe: "Tax document already exists",
       });
     }
 
@@ -341,6 +366,7 @@ const createAdminUser = async (req, res) => {
         username,
         firstName,
         lastName,
+        taxDocument,
         password: hashedPassword,
         email,
         phone,
@@ -680,7 +706,7 @@ module.exports = {
   getUserById,
   searchUserTransporterByLocation,
   createTransporterUser,
-  createAdminUser,
+  createOperatorUser,
   sendTokenToUpdatePassword,
   updateLocation,
   updateWorkDays,

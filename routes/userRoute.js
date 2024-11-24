@@ -23,9 +23,9 @@ router.post(
   userController.createTransporterUser
 );
 router.post(
-  "/user/admin/register",
+  "/user/operator/register",
   upload.single("profileImage"),
-  userController.createAdminUser
+  userController.createOperatorUser
 );
 router.post("/user/:id/car", verifyToken, carController.registerCar);
 router.post("/user/:id/delivery", deliveryController.registerDelivery);
