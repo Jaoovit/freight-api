@@ -21,26 +21,25 @@ const getUnpaidDelivery = async (req, res) => {
 };
 
 const registerDelivery = async (req, res) => {
-  const userId = parseInt(req.params.id, 10);
+  const carId = parseInt(req.params.id, 10);
   try {
-    if (isNaN(userId)) {
-      return res.status(400).json({ message: "Invalid user id" });
+    if (isNaN(carId)) {
+      return res.status(400).json({ message: "Invalid car id" });
     }
 
-    const userExists = await prisma.user.findUnique({
-      where: { id: userId },
-      include: { car: true },
+    const carExists = await prisma.car.findUnique({
+      where: { id: carId },
     });
 
-    if (!userExists) {
-      return res.status(404).json({ message: "User not found" });
+    if (!carExists) {
+      return res.status(404).json({ message: "Car not found" });
     }
 
-    const { protocol } = req.body;
+    const { protocol, origin, destination } = req.body;
 
     const price = parseFloat(req.body.price);
 
-    if (!protocol || !price) {
+    if (!protocol || !price || !origin || !destination) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -65,6 +64,8 @@ const registerDelivery = async (req, res) => {
         price,
         fee,
         status,
+        origin,
+        destination,
       },
     });
     return res

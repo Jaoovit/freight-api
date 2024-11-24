@@ -38,7 +38,6 @@ router.post(
   userController.createManagerUser
 );
 router.post("/user/:id/car", verifyToken, carController.registerCar);
-router.post("/user/:id/delivery", deliveryController.registerDelivery);
 router.post("/user/forgot_password", userController.sendTokenToUpdatePassword);
 
 //Put

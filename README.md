@@ -45,11 +45,13 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 
     - **/user/transporter/register**: Register an user with the role of transporter.
 
-    - **/user/admin/register**: Register an user with the role of admin.
+    - **/user/operator/register**: Register an user with the role of operator.
 
-    - **/user/:id/car**: Retrive car details by user id.
+    - **/user/supervisor/register**: Register an user with the role of supervisor.
 
-    - **/user/:id/delivery**: Retrive delivery details by user id.
+    - **/user/manager/register**: Register an user with the role of manager.
+
+    - **/user/:id/car**: Register a car by user id.
 
     - **/user/forgot_password**: Send a email with a token to recover password.
 
@@ -74,6 +76,10 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 - **DELETE**
 
     - **/car/:id**: Delete car by car id
+
+- **POST**
+
+    - **/car/:id/delivery**: Register a delivery by car id.
 
 ### Delivery
 

@@ -64,12 +64,14 @@ model CarImage {
 }
 
 model Delivery {
-  id        Int      @id @default(autoincrement())
-  carId     Int
-  car       Car      @relation(fields: [carId], references: [id])
-  protocol  String   @unique
-  price     Float
-  fee       Float
-  status    String
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  carId       Int
+  car         Car      @relation(fields: [carId], references: [id])
+  protocol    String   @unique
+  price       Float
+  fee         Float
+  status      String
+  origin      String
+  destination String
+  createdAt   DateTime @default(now())
 }
