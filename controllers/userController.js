@@ -46,7 +46,6 @@ const getUserById = async (req, res) => {
       },
       include: {
         car: true,
-        delivery: true,
       },
     });
     return res
@@ -242,12 +241,10 @@ const createTransporterUser = async (req, res) => {
       },
     });
 
-    return res
-      .status(200)
-      .json({
-        message: "Transporter user created successfully",
-        user: newTransporterUser,
-      });
+    return res.status(200).json({
+      message: "Transporter user created successfully",
+      user: newTransporterUser,
+    });
   } catch (error) {
     console.error("Error details:", error);
     return res

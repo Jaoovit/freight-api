@@ -2,6 +2,43 @@ const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const cloudinary = require("../config/cloudinary");
 
+const getCarById = async (req, res) => {
+  const carId = parseInt(req.params.id, 10);
+
+  try {
+    if (isNaN(carId)) {
+      return res.status(400).json({
+        message: "Invalid car id",
+      });
+    }
+
+    const carExist = await prisma.car.findUnique({
+      where: { id: carId },
+    });
+
+    if (!carExist) {
+      return res.status(400).json({
+        message: "Car not found",
+      });
+    }
+
+    const car = await prisma.car.findUnique({
+      where: {
+        id: carId,
+      },
+      include: {
+        delivery: true,
+      },
+    });
+    return res
+      .status(200)
+      .json({ message: `Car ${carId} got sucessfully`, car: car });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: `Error getting can ${carId}` });
+  }
+};
+
 const registerCar = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
@@ -185,4 +222,4 @@ const deleteCar = async (req, res) => {
   }
 };
 
-module.exports = { registerCar, updateCarSize, deleteCar };
+module.exports = { getCarById, registerCar, updateCarSize, deleteCar };

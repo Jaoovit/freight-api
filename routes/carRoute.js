@@ -4,6 +4,9 @@ const deliveryController = require("../controllers/deliveryController");
 const verifyToken = require("../config/token");
 const router = express.Router();
 
+// Get
+router.get("/car/:id", carController.getCarById);
+
 // Put
 router.put("/car/:id", verifyToken, carController.updateCarSize);
 

@@ -69,6 +69,10 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 
 ### Car
 
+- **GET**
+
+    - **/car/:id**: Retrieve details of a car
+
 - **PUT**
 
     - **/car/:id**: Update car details by car id.

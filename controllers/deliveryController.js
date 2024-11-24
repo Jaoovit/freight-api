@@ -59,7 +59,7 @@ const registerDelivery = async (req, res) => {
 
     const delivery = await prisma.delivery.create({
       data: {
-        userId: userId,
+        carId: carId,
         protocol,
         price,
         fee,
