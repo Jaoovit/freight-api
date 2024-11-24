@@ -18,6 +18,7 @@ model Session {
 
 model User {
   id                   Int    @id @default(autoincrement())
+  taxDocument          String
   username             String @unique
   password             String
   firstName            String
@@ -32,7 +33,6 @@ model User {
   role                 String
   workdays             String[] @default([])
   car                  Car[]
-  delivery             Delivery[]
   passwordResetToken   String?
   passwordResetExpires DateTime?
 }
@@ -43,16 +43,30 @@ model Car {
   user         User   @relation(fields: [userId], references: [id])
   registration String @unique
   model        String
+  year         String
   color        String
   height       Float
   width        Float
   depth        Float
+  capacity     Float
+  category     String
+  delivery     Delivery[]
+  carImage     CarImage[]
+}
+
+model CarImage {
+  id        Int      @id @default(autoincrement())
+  carId     Int
+  car       Car      @relation(fields: [carId], references: [id])
+  imageUrl  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Delivery {
   id        Int      @id @default(autoincrement())
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  carId     Int
+  car       Car      @relation(fields: [carId], references: [id])
   protocol  String   @unique
   price     Float
   fee       Float

@@ -13,6 +13,7 @@ CREATE TABLE "Session" (
 -- CreateTable
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
+    "taxDocument" TEXT NOT NULL,
     "username" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
@@ -26,6 +27,8 @@ CREATE TABLE "User" (
     "postalCode" TEXT,
     "role" TEXT NOT NULL,
     "workdays" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "passwordResetToken" TEXT,
+    "passwordResetExpires" TIMESTAMP(3),
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -36,18 +39,32 @@ CREATE TABLE "Car" (
     "userId" INTEGER NOT NULL,
     "registration" TEXT NOT NULL,
     "model" TEXT NOT NULL,
+    "year" TEXT NOT NULL,
     "color" TEXT NOT NULL,
     "height" DOUBLE PRECISION NOT NULL,
     "width" DOUBLE PRECISION NOT NULL,
     "depth" DOUBLE PRECISION NOT NULL,
+    "capacity" DOUBLE PRECISION NOT NULL,
+    "category" TEXT NOT NULL,
 
     CONSTRAINT "Car_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "CarImage" (
+    "id" SERIAL NOT NULL,
+    "carId" INTEGER NOT NULL,
+    "imageUrl" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CarImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Delivery" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "carId" INTEGER NOT NULL,
     "protocol" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "fee" DOUBLE PRECISION NOT NULL,
@@ -79,4 +96,7 @@ CREATE UNIQUE INDEX "Delivery_protocol_key" ON "Delivery"("protocol");
 ALTER TABLE "Car" ADD CONSTRAINT "Car_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Delivery" ADD CONSTRAINT "Delivery_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "CarImage" ADD CONSTRAINT "CarImage_carId_fkey" FOREIGN KEY ("carId") REFERENCES "Car"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Delivery" ADD CONSTRAINT "Delivery_carId_fkey" FOREIGN KEY ("carId") REFERENCES "Car"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
