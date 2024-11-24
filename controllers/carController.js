@@ -26,7 +26,7 @@ const registerCar = async (req, res) => {
         .json({ message: "User cannot have more than 5 registered cars" });
     }
 
-    const { registration, model, color } = req.body;
+    const { registration, model, color, category, year } = req.body;
 
     const existingRegistration = await prisma.car.findUnique({
       where: { registration: registration },
@@ -36,7 +36,7 @@ const registerCar = async (req, res) => {
       return res.status(400).json({ message: "Registration already exists" });
     }
 
-    if (!registration || !model || !color) {
+    if (!registration || !model || !color || !category || !year) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -48,9 +48,29 @@ const registerCar = async (req, res) => {
       return res.status(400).json({ message: "Invalid dimensions" });
     }
 
-    if (!height || !width || !depth) {
+    const capacity = parseFloat(req.body.capacity);
+
+    if (isNaN(capacity)) {
+      return res.status(400).json({ message: "Invalid capacity" });
+    }
+
+    if (!height || !width || !depth || !capacity) {
       return res.status(400).json({ message: "All fields are required" });
     }
+
+    let imageUrls = [];
+    const uploadPromises = images.map((image) => {
+      return new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ resource_type: "image" }, (error, result) => {
+            if (error) {
+              return reject(error);
+            }
+            resolve(result.secure_url);
+          })
+          .end(image.buffer);
+      });
+    });
 
     const car = await prisma.car.create({
       data: {
@@ -61,6 +81,12 @@ const registerCar = async (req, res) => {
         height,
         width,
         depth,
+        capacity,
+        category,
+        year,
+        carImage: {
+          create: imageUrls.map((imageUrl) => ({ imageUrl })),
+        },
       },
     });
     return res

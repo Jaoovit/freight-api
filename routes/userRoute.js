@@ -37,7 +37,12 @@ router.post(
   upload.single("profileImage"),
   userController.createManagerUser
 );
-router.post("/user/:id/car", verifyToken, carController.registerCar);
+router.post(
+  "/user/:id/car",
+  verifyToken,
+  upload.array("images"),
+  carController.registerCar
+);
 router.post("/user/forgot_password", userController.sendTokenToUpdatePassword);
 
 //Put
