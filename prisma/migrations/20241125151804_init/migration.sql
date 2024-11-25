@@ -18,6 +18,7 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
+    "iban" TEXT,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "profileImage" TEXT NOT NULL,
@@ -69,6 +70,8 @@ CREATE TABLE "Delivery" (
     "price" DOUBLE PRECISION NOT NULL,
     "fee" DOUBLE PRECISION NOT NULL,
     "status" TEXT NOT NULL,
+    "origin" TEXT NOT NULL,
+    "destination" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Delivery_pkey" PRIMARY KEY ("id")
@@ -78,7 +81,13 @@ CREATE TABLE "Delivery" (
 CREATE UNIQUE INDEX "Session_sid_key" ON "Session"("sid");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "User_taxDocument_key" ON "User"("taxDocument");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_iban_key" ON "User"("iban");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");

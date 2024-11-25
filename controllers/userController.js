@@ -90,6 +90,7 @@ const createTransporterUser = async (req, res) => {
       username,
       firstName,
       lastName,
+      iban,
       taxDocument,
       password,
       confPassword,
@@ -105,6 +106,7 @@ const createTransporterUser = async (req, res) => {
       !username ||
       !firstName ||
       !lastName ||
+      !iban ||
       !taxDocument ||
       !password ||
       !confPassword ||
@@ -152,6 +154,16 @@ const createTransporterUser = async (req, res) => {
     if (existingPhone) {
       return res.status(400).json({
         message: "Phone number already exists",
+      });
+    }
+
+    const existingIban = await prisma.user.findUnique({
+      where: { iban: iban },
+    });
+
+    if (existingIban) {
+      return res.status(400).json({
+        message: "IBAN already exists",
       });
     }
 
@@ -227,6 +239,7 @@ const createTransporterUser = async (req, res) => {
         username,
         firstName,
         lastName,
+        iban,
         taxDocument,
         password: hashedPassword,
         email,

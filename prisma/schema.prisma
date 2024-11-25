@@ -17,14 +17,15 @@ model Session {
 }
 
 model User {
-  id                   Int    @id @default(autoincrement())
-  taxDocument          String @unique
-  username             String @unique
+  id                   Int     @id @default(autoincrement())
+  taxDocument          String  @unique
+  username             String  @unique
   password             String
   firstName            String
   lastName             String
-  email                String @unique
-  phone                String @unique
+  iban                 String? @unique
+  email                String  @unique
+  phone                String  @unique
   profileImage         String
   state                String?
   city                 String?
