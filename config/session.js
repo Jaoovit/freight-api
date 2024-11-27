@@ -11,12 +11,19 @@ const sessionMiddleware = session({
   secret: SECRET,
   resave: false,
   saveUninitialized: true,
+  rolling: true,
   store: new PrismaSessionStore(prisma, {
     checkPeriod: 2 * 60 * 1000,
     dbRecordIdIsSessionId: true,
+    onError: (error) => {
+      console.error("Session Store Error:", error);
+    },
   }),
   cookie: {
     maxAge: 1000 * 60 * 60 * 24,
+    secure: process.env.NODE_ENV === "production",
+    httpOnly: true,
+    sameSite: "strict",
   },
 });
 
