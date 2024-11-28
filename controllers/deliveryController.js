@@ -35,11 +35,11 @@ const registerDelivery = async (req, res) => {
       return res.status(404).json({ message: "Car not found" });
     }
 
-    const { protocol, origin, destination } = req.body;
+    const { protocol, origin, destination, scheduledAt } = req.body;
 
     const price = parseFloat(req.body.price);
 
-    if (!protocol || !price || !origin || !destination) {
+    if (!protocol || !price || !origin || !destination || !scheduledAt) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -65,8 +65,10 @@ const registerDelivery = async (req, res) => {
         price,
         fee,
         paymentStatus,
+        deliveryStatus,
         origin,
         destination,
+        scheduledAt: new Date(scheduledAt),
       },
     });
     return res
