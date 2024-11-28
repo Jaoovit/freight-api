@@ -13,4 +13,10 @@ router.put(
   deliveryController.updateDeliveryToPaid
 );
 
+router.put(
+  "/delivery/:id",
+  verifyToken,
+  deliveryController.updateDeliveryToDelivered
+);
+
 module.exports = router;

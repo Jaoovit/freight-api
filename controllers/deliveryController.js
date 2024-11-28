@@ -55,7 +55,8 @@ const registerDelivery = async (req, res) => {
 
     const fee = price * 0.7;
 
-    let status = "Unpaid";
+    let paymentStatus = "unpaid";
+    let deliveryStatus = "undelivered";
 
     const delivery = await prisma.delivery.create({
       data: {
@@ -63,7 +64,7 @@ const registerDelivery = async (req, res) => {
         protocol,
         price,
         fee,
-        status,
+        paymentStatus,
         origin,
         destination,
       },
@@ -96,14 +97,14 @@ const updateDeliveryToPaid = async (req, res) => {
         .json({ message: `Delivery ${deliveryId} not found` });
     }
 
-    const status = "paid";
+    const paymentStatus = "paid";
 
     const delivery = await prisma.delivery.update({
       where: {
         id: deliveryId,
       },
       data: {
-        status: status,
+        paymentStatus: paymentStatus,
       },
     });
     return res.status(200).json({
@@ -118,4 +119,50 @@ const updateDeliveryToPaid = async (req, res) => {
   }
 };
 
-module.exports = { getUnpaidDelivery, registerDelivery, updateDeliveryToPaid };
+const updateDeliveryToDelivered = async (req, res) => {
+  const deliveryId = parseInt(req.params.id, 10);
+  try {
+    if (isNaN(deliveryId)) {
+      return res.status(400).json({ message: "Invalid delivery id" });
+    }
+
+    const deliveryExists = await prisma.delivery.findUnique({
+      where: {
+        id: deliveryId,
+      },
+    });
+
+    if (!deliveryExists) {
+      return res
+        .status(404)
+        .json({ message: `Delivery ${deliveryId} not found` });
+    }
+
+    const deliveryStatus = "delivered";
+
+    const delivery = await prisma.delivery.update({
+      where: {
+        id: deliveryId,
+      },
+      data: {
+        deliveryStatus: deliveryStatus,
+      },
+    });
+    return res.status(200).json({
+      message: `Delivery ${deliveryId} status updated to delivered sucessfully`,
+      delivery: delivery,
+    });
+  } catch (error) {
+    console.error("Error details", error);
+    return res
+      .status(500)
+      .json({ message: `Error updating delivery ${deliveryId} to paid` });
+  }
+};
+
+module.exports = {
+  getUnpaidDelivery,
+  registerDelivery,
+  updateDeliveryToPaid,
+  updateDeliveryToDelivered,
+};
