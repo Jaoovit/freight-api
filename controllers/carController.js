@@ -39,6 +39,43 @@ const getCarById = async (req, res) => {
   }
 };
 
+const getCarByUserId = async (req, res) => {
+  const userId = parseInt(req.params.id);
+  try {
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        message: "Invalid user id",
+      });
+    }
+
+    const userExist = await prisma.car.findUnique({
+      where: { id: userId },
+    });
+
+    if (!userExist) {
+      return res.status(400).json({
+        message: "Car not found",
+      });
+    }
+
+    const cars = await prisma.car.findMany({
+      where: { userId: userId },
+      include: {
+        delivery: true,
+      },
+    });
+
+    return res
+      .status(200)
+      .json({ message: `User ${userId} cars gotted sucessfully`, cars: cars });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res
+      .status(500)
+      .json({ message: `Error getting can by user ${userId}` });
+  }
+};
+
 const registerCar = async (req, res) => {
   const userId = parseInt(req.params.id, 10);
 
@@ -226,4 +263,10 @@ const deleteCar = async (req, res) => {
   }
 };
 
-module.exports = { getCarById, registerCar, updateCarSize, deleteCar };
+module.exports = {
+  getCarById,
+  getCarByUserId,
+  registerCar,
+  updateCarSize,
+  deleteCar,
+};

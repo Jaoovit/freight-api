@@ -6,6 +6,7 @@ const router = express.Router();
 
 // Get
 router.get("/car/:id", carController.getCarById);
+router.get("/car/user/:id", carController.getCarByUserId);
 
 // Put
 router.put("/car/:id", verifyToken, carController.updateCarSize);

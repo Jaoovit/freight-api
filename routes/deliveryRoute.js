@@ -5,6 +5,7 @@ const router = express.Router();
 
 // Get
 router.get("/delivery/unpaid", deliveryController.getUnpaidDelivery);
+router.get("/delivery/undelivered", deliveryController.getUndeliveredDelivery);
 
 // Put
 router.put(

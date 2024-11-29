@@ -3,16 +3,35 @@ const prisma = new PrismaClient();
 
 const getUnpaidDelivery = async (req, res) => {
   try {
-    const status = "Unpaid";
+    const paymentStatus = "unpaid";
 
     const unpaidDelivery = await prisma.delivery.findMany({
       where: {
-        status: status,
+        paymentStatus: paymentStatus,
       },
     });
     return res.status(200).json({
       message: "Unpaid delivery got sucessfully",
       unpaidDelivery: unpaidDelivery,
+    });
+  } catch (error) {
+    console.error("Error details:", error);
+    return res.status(500).json({ message: "Error getting unpaid delivery" });
+  }
+};
+
+const getUndeliveredDelivery = async (req, res) => {
+  try {
+    const deliveryStatus = "undelivered";
+
+    const undeliveredDelivery = await prisma.delivery.findMany({
+      where: {
+        deliveryStatus: deliveryStatus,
+      },
+    });
+    return res.status(200).json({
+      message: "Undelivered delivery got sucessfully",
+      undeliveredDelivery: undeliveredDelivery,
     });
   } catch (error) {
     console.error("Error details:", error);
@@ -164,6 +183,7 @@ const updateDeliveryToDelivered = async (req, res) => {
 
 module.exports = {
   getUnpaidDelivery,
+  getUndeliveredDelivery,
   registerDelivery,
   updateDeliveryToPaid,
   updateDeliveryToDelivered,
