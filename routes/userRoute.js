@@ -2,7 +2,6 @@ const express = require("express");
 const multer = require("multer");
 const userController = require("../controllers/userController");
 const carController = require("../controllers/carController");
-const deliveryController = require("../controllers/deliveryController");
 const router = express.Router();
 const verifyToken = require("../config/token");
 
@@ -15,6 +14,7 @@ router.get(
   "/user/transporter/search",
   userController.searchUserTransporterByLocation
 );
+router.get("/user/transporter/:carId", userController.getTransporterByCarId);
 
 // Post
 router.post(

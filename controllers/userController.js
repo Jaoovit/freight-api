@@ -14,6 +14,9 @@ const getTransportesUsers = async (req, res) => {
       where: {
         role: role,
       },
+      include: {
+        car: true,
+      },
     });
     return res.status(200).json({
       message: "Got transportes sucessfully",
@@ -22,6 +25,42 @@ const getTransportesUsers = async (req, res) => {
   } catch (error) {
     console.error("Error details:", error);
     return res.status(500).json({ message: "Error getting transporter user" });
+  }
+};
+
+const getTransporterByCarId = async (req, res) => {
+  try {
+    const { carId } = req.params;
+
+    const transporter = await prisma.user.findFirst({
+      where: {
+        role: "transporter",
+        car: {
+          some: {
+            id: parseInt(carId),
+          },
+        },
+      },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        iban: true,
+        taxDocument: true,
+      },
+    });
+
+    if (!transporter) {
+      return res.status(404).json({ message: "Transporter not found" });
+    }
+
+    return res.status(200).json({
+      message: "Transporter fetched successfully",
+      transporter,
+    });
+  } catch (error) {
+    console.error("Error fetching transporter by car ID:", error);
+    return res.status(500).json({ message: "Error fetching transporter" });
   }
 };
 
@@ -980,6 +1019,7 @@ const updatePassword = async (req, res) => {
 };
 
 module.exports = {
+  getTransporterByCarId,
   getTransportesUsers,
   getUserById,
   searchUserTransporterByLocation,
