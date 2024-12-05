@@ -8,13 +8,17 @@ const router = express.Router();
 router.get("/car/:id", carController.getCarById);
 router.get("/car/user/:id", carController.getCarByUserId);
 
+// Post
+router.post(
+  "/car/:id/delivery",
+  verifyToken,
+  deliveryController.registerDelivery
+);
+
 // Put
 router.put("/car/:id", verifyToken, carController.updateCarSize);
 
 // Delete
 router.delete("/car/:id", verifyToken, carController.deleteCar);
-
-// Post
-router.post("/car/:id/delivery", deliveryController.registerDelivery);
 
 module.exports = router;

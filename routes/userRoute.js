@@ -19,21 +19,25 @@ router.get("/user/transporter/:carId", userController.getTransporterByCarId);
 // Post
 router.post(
   "/user/transporter/register",
+  verifyToken,
   upload.single("profileImage"),
   userController.createTransporterUser
 );
 router.post(
   "/user/operator/register",
+  verifyToken,
   upload.single("profileImage"),
   userController.createOperatorUser
 );
 router.post(
   "/user/supervisor/register",
+  verifyToken,
   upload.single("profileImage"),
   userController.createSupervisorUser
 );
 router.post(
   "/user/manager/register",
+  verifyToken,
   upload.single("profileImage"),
   userController.createManagerUser
 );

@@ -28,6 +28,7 @@ const getCarById = async (req, res) => {
       },
       include: {
         delivery: true,
+        carImage: true,
       },
     });
     return res

@@ -41,6 +41,8 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 
     - **/user/transporter/search/search?query=${query}**: Retrive user by location using query params.
 
+    - **/user/transporter/:carId**: Retrive transporter information by car id.
+
 - **POST**
 
     - **/user/transporter/register**: Register an user with the role of transporter.
@@ -71,7 +73,13 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 
 - **GET**
 
-    - **/car/:id**: Retrieve details of a car
+    - **/car/:id**: Retrieve details of a car.
+
+    - **/car/user/:id**: Retrive car by user id.
+
+- **POST**
+
+    - **/car/:id/delivery**: Register a delivery by car id.
 
 - **PUT**
 
@@ -79,17 +87,18 @@ A RESTful API for freight management, built with Node.js and Prisma ORM. This AP
 
 - **DELETE**
 
-    - **/car/:id**: Delete car by car id
+    - **/car/:id**: Delete car by car id.
 
-- **POST**
-
-    - **/car/:id/delivery**: Register a delivery by car id.
 
 ### Delivery
 
 - **GET**
 
-    - **/delivery/unpaid**: Retrive unpaid deliveries.
+    - **/delivery**: Return all deliveries.
+
+    - **/delivery/unpaid**: Retrive unpaid deliveries. 
+    
+    - **/delivery/undelivered**: REtrive undelivered deliveries.
 
 - **PUT**
 
@@ -165,6 +174,16 @@ Before starting, ensure you have the following installed:
 
         - ADMIN_SECRET: Secret used for creating the admin account.
 
+    - Configure the first manager account informations:
+
+        - INITIAL_MANAGER_USERNAME=
+        - INITIAL_MANAGER_PASSWORD=
+        - INITIAL_MANAGER_EMAIL=
+        - INITIAL_MANAGER_FIRST_NAME=
+        - INITIAL_MANAGER_LAST_NAME=
+        - INITIAL_MANAGER_TAX_DOCUMENT=
+        - INITIAL_MANAGER_PHONE=
+
 
 ## 🏃‍➡️ Start
 
@@ -174,5 +193,7 @@ Before starting, ensure you have the following installed:
     npm install
 
     npx prisma migrate dev --name init
+
+    node scripts/initManager.js manager
 
     npm run start
