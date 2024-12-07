@@ -49,13 +49,13 @@ const getCarByUserId = async (req, res) => {
       });
     }
 
-    const userExist = await prisma.car.findUnique({
+    const userExist = await prisma.user.findUnique({
       where: { id: userId },
     });
 
     if (!userExist) {
       return res.status(400).json({
-        message: "Car not found",
+        message: "User not found",
       });
     }
 
