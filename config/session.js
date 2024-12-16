@@ -13,7 +13,7 @@ const sessionMiddleware = session({
   saveUninitialized: true,
   rolling: true,
   store: new PrismaSessionStore(prisma, {
-    checkPeriod: 2 * 60 * 1000,
+    checkPeriod: 60 * 60 * 1000,
     dbRecordIdIsSessionId: true,
     onError: (error) => {
       console.error("Session Store Error:", error);
